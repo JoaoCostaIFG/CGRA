@@ -26,8 +26,9 @@ class MyInterface extends CGFinterface {
     //Checkbox element in GUI
     this.gui.add(this.scene, "displayAxis").name("Display Axis");
 
-    // Checkboxes dos triangulos
-    this.gui.add(this.scene, "diamondVis").name("Diamond visibility");
+    // object's visibility
+    this.gui.add(this.scene, "tangramVis").name("Tangram visibility");
+    this.gui.add(this.scene, "cubeVis").name("Cube visibility");
 
     //Slider element in GUI
     this.gui.add(this.scene, "scaleFactor", 0.1, 5).name("Scale Factor");
