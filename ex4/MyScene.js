@@ -24,7 +24,8 @@ class MyScene extends CGFscene {
         //Initialize scene objects
         this.axis = new CGFaxis(this);
         this.quad = new MyQuad(this);
-        this.tangram = new MyTangram(this);
+        // this.tangram = new MyTangram(this);
+        this.cube = new MyUnitCubeQuad(this);
 
         //------ Applied Material
         this.quadMaterial = new CGFappearance(this);
@@ -114,8 +115,9 @@ class MyScene extends CGFscene {
 
         // ---- BEGIN Primitive drawing section
 
-        this.quadMaterial.apply();
-        this.tangram.display();
+        // this.quadMaterial.apply();
+        // this.tangram.display();
+        this.cube.display();
 
         // Default texture filtering in WebCGF is LINEAR. 
         // Uncomment next line for NEAREST when magnifying, or 
