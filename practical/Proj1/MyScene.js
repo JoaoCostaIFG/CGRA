@@ -26,11 +26,11 @@ class MyScene extends CGFscene {
     //Initialize scene objects
     this.axis = new CGFaxis(this);
 
-    this.cilinder = new ToplessCilinder(this, 6, 8);
     this.earthMaterial = new CGFappearance(this);
     this.textureTangram = new CGFtexture(this, "images/earth.jpg");
     this.earthMaterial.setTexture(this.textureTangram);
-    // this.incompleteSphere = new MySphere(this, 16, 8);
+    // this.cilinder = new ToplessCilinder(this, 6, 8);
+    this.sphere = new MySphere(this, 16, 8);
 
     //Objects connected to MyInterface
     this.displayAxis = true;
@@ -81,8 +81,8 @@ class MyScene extends CGFscene {
 
     //This sphere does not have defined texture coordinates
     this.earthMaterial.apply();
-    this.cilinder.display();
-    // this.incompleteSphere.display();
+    // this.cilinder.display();
+    this.sphere.display();
 
     // ---- END Primitive drawing section
   }

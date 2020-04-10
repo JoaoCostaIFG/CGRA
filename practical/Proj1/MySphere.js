@@ -16,13 +16,17 @@ class MySphere extends CGFobject {
   /**
    * @method initBuffers
    * Initializes the sphere buffers
-   * TODO: DEFINE TEXTURE COORDINATES
    */
   initBuffers() {
     this.vertices = [];
     this.indices = [];
     this.normals = [];
     this.texCoords = [];
+
+    var texCurrX = 0;
+    var texCurrY = 0;
+    var texStepX = 1.0 / this.longDivs;
+    var texStepY = 1.0 / this.latDivs;
 
     var phi = 0;
     var theta = 0;
@@ -51,13 +55,13 @@ class MySphere extends CGFobject {
           // pushing two triangles using indices from this round (current, current+1)
           // and the ones directly south (next, next+1)
           // (i.e. one full round of slices ahead)
-          
-          this.indices.push( current + 1, current, next);
-          this.indices.push( current + 1, next, next +1);
+
+          this.indices.push(current + 1, current, next);
+          this.indices.push(current + 1, next, next + 1);
         }
 
         //--- Normals
-        // at each vertex, the direction of the normal is equal to 
+        // at each vertex, the direction of the normal is equal to
         // the vector from the center of the sphere to the vertex.
         // in a sphere of radius equal to one, the vector length is one.
         // therefore, the value of the normal is equal to the position vectro
@@ -65,13 +69,13 @@ class MySphere extends CGFobject {
         theta += thetaInc;
 
         //--- Texture Coordinates
-        // To be done... 
-        // May need some additional code also in the beginning of the function.
-        
+        this.texCoords.push(texCurrX, texCurrY);
+        texCurrX += texStepX;
       }
+      texCurrX = 0;
+      texCurrY += texStepY;
       phi += phiInc;
     }
-
 
     this.primitiveType = this.scene.gl.TRIANGLES;
     this.initGLBuffers();
