@@ -69,11 +69,15 @@ class MySphere extends CGFobject {
         theta += thetaInc;
 
         //--- Texture Coordinates
+        // goes around the sphere (iterates over 1 full line of the texture)
         this.texCoords.push(texCurrX, texCurrY);
         texCurrX += texStepX;
       }
+
+      // goes to the beginning of the next line of the texture
       texCurrX = 0;
       texCurrY += texStepY;
+
       phi += phiInc;
     }
 
