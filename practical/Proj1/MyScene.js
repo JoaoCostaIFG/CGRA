@@ -23,18 +23,35 @@ class MyScene extends CGFscene {
 
     this.enableTextures(true);
 
-    //Initialize scene objects
+    /* Initialize scene objects */
     this.axis = new CGFaxis(this);
 
-    this.earthMaterial = new CGFappearance(this);
-    this.textureTangram = new CGFtexture(this, "images/earth.jpg");
-    this.earthMaterial.setTexture(this.textureTangram);
-    // this.cilinder = new ToplessCilinder(this, 6, 8);
-    this.sphere = new MySphere(this, 16, 8);
+    // cubemap
+    this.cubemap = new MyCubeMap(this);
+    this.cubemapMaterial = new CGFappearance(this);
+    this.cubemapTexs = [
+      new CGFtexture(this, "images/cubemap.png"),
+      new CGFtexture(this, "images/cubemap_water.png"),
+      new CGFtexture(this, "images/cubemap_mars.png"),
+      new CGFtexture(this, "images/cubemap_hardwarestore.png"),
+    ];
+    this.selectedCubemap = 1;
+    this.cubemapList = {
+      Default: 0,
+      Water: 1,
+      Mars: 2,
+      "Hardware Store": 3,
+    };
+
+    // vehicle
+    this.speedFactor = 0.1;
+    this.sizeFactor = 0.5;
+    this.vehicle = new MyVehicle(this, 3, 3);
 
     //Objects connected to MyInterface
     this.displayAxis = true;
   }
+
   initLights() {
     this.lights[0].setPosition(15, 2, 5, 1);
     this.lights[0].setDiffuse(1.0, 1.0, 1.0, 1.0);
@@ -61,7 +78,24 @@ class MyScene extends CGFscene {
     //To be done...
   }
 
+  checkKeys() {
+    // TODO map setas multi set
+    if (this.vehicle.v > 0) {
+      this.vehicle.v -= 0.03 * this.speedFactor;
+      if (this.vehicle.v > 0.5 * this.speedFactor)
+        this.vehicle.v = 0.5 * this.speedFactor;
+    } else if (this.vehicle.v < 0) this.vehicle.v = 0;
+
+    // Check for key codes e.g. in https://keycode.info/
+    if (this.gui.isKeyPressed("KeyW")) this.vehicle.v += 0.1 * this.speedFactor;
+    if (this.gui.isKeyPressed("KeyS")) this.vehicle.v -= 0.5 * this.speedFactor;
+    if (this.gui.isKeyPressed("KeyA")) this.vehicle.ang += 0.1;
+    if (this.gui.isKeyPressed("KeyD")) this.vehicle.ang -= 0.1;
+  }
+
   display() {
+    this.checkKeys();
+
     // ---- BEGIN Background, camera and axis setup
     // Clear image and depth buffer everytime we update the scene
     this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
@@ -79,10 +113,26 @@ class MyScene extends CGFscene {
 
     // ---- BEGIN Primitive drawing section
 
-    //This sphere does not have defined texture coordinates
-    this.earthMaterial.apply();
-    // this.cilinder.display();
-    this.sphere.display();
+    // Cubemap
+    this.cubemapMaterial.setTexture(this.cubemapTexs[this.selectedCubemap]);
+    this.cubemapMaterial.apply();
+    this.cubemap.display();
+
+    // Vehicle
+    this.pushMatrix();
+    this.translate(
+      this.vehicle.pos[0],
+      this.vehicle.pos[1],
+      this.vehicle.pos[2]
+    );
+    this.scale(this.sizeFactor, this.sizeFactor, this.sizeFactor);
+    this.translate(
+      -this.vehicle.pos[0],
+      -this.vehicle.pos[1],
+      -this.vehicle.pos[2]
+    );
+    this.vehicle.display();
+    this.popMatrix();
 
     // ---- END Primitive drawing section
   }
