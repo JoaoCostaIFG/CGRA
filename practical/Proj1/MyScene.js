@@ -29,6 +29,9 @@ class MyScene extends CGFscene {
     // cubemap
     this.cubemap = new MyCubeMap(this);
     this.cubemapMaterial = new CGFappearance(this);
+    this.cubemapMaterial.setAmbient(255, 255, 255, 0);
+    this.cubemapMaterial.setDiffuse(0, 0, 0, 0);
+    this.cubemapMaterial.setSpecular(0, 0, 0, 0);
     this.cubemapTexs = [
       new CGFtexture(this, "images/cubemap.png"),
       new CGFtexture(this, "images/cubemap_water.png"),
