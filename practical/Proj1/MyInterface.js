@@ -35,27 +35,24 @@ class MyInterface extends CGFinterface {
   initKeys() {
     // create reference from the scene to the GUI
     this.scene.gui = this;
-
     // disable the processKeyboard function
     this.processKeyboard = function () {};
-
     // create a named array to store which keys are being pressed
-    this.activeKeys = {};
+    this.activeKeys = new Map();
   }
 
   processKeyDown(event) {
-    // called when a key is pressed down
-    // mark it as active in the array
-    this.activeKeys[event.code] = true;
+    // called when a key is pressed down, mark it as active in the array
+    this.activeKeys.set(event.location + event.code, true);
   }
 
   processKeyUp(event) {
     // called when a key is released, mark it as inactive in the array
-    this.activeKeys[event.code] = false;
+    this.activeKeys.set(event.location + event.code, false);
   }
 
   isKeyPressed(keyCode) {
     // returns true if a key is marked as pressed, false otherwise
-    return this.activeKeys[keyCode] || false;
+    return this.activeKeys.get(keyCode) || false;
   }
 }

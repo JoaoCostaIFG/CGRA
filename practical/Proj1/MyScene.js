@@ -44,8 +44,8 @@ class MyScene extends CGFscene {
     };
 
     // vehicle
-    this.speedFactor = 0.1;
-    this.sizeFactor = 0.5;
+    this.speedFactor = 0.5;
+    this.sizeFactor = 1.5;
     this.vehicle = new MyVehicle(this, 3, 3);
 
     //Objects connected to MyInterface
@@ -63,7 +63,7 @@ class MyScene extends CGFscene {
       0.4,
       0.1,
       500,
-      vec3.fromValues(15, 15, 15),
+      vec3.fromValues(0, 50, -50),
       vec3.fromValues(0, 0, 0)
     );
   }
@@ -87,10 +87,10 @@ class MyScene extends CGFscene {
     } else if (this.vehicle.v < 0) this.vehicle.v = 0;
 
     // Check for key codes e.g. in https://keycode.info/
-    if (this.gui.isKeyPressed("KeyW")) this.vehicle.v += 0.1 * this.speedFactor;
-    if (this.gui.isKeyPressed("KeyS")) this.vehicle.v -= 0.5 * this.speedFactor;
-    if (this.gui.isKeyPressed("KeyA")) this.vehicle.ang += 0.1;
-    if (this.gui.isKeyPressed("KeyD")) this.vehicle.ang -= 0.1;
+    if (this.gui.isKeyPressed(0 + "KeyW")) this.vehicle.v += 0.1 * this.speedFactor;
+    if (this.gui.isKeyPressed(0 + "KeyS")) this.vehicle.v -= 0.5 * this.speedFactor;
+    if (this.gui.isKeyPressed(0 + "KeyA")) this.vehicle.ang += 0.1;
+    if (this.gui.isKeyPressed(0 + "KeyD")) this.vehicle.ang -= 0.1;
   }
 
   display() {
