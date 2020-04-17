@@ -24,6 +24,8 @@ class MyInterface extends CGFinterface {
       .add(this.scene, "selectedCubemap", this.scene.cubemapList)
       .name("Cubemaps");
 
+    // vehicle settings
+    this.gui.add(this.scene, "raceCarControl").name("Race car controls");
     this.gui.add(this.scene, "speedFactor", 0.1, 3.0).name("Vehicle Speed");
     this.gui.add(this.scene, "sizeFactor", 0.5, 3.0).name("Vehicle Size");
 

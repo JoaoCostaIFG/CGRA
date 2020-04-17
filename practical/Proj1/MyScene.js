@@ -47,6 +47,7 @@ class MyScene extends CGFscene {
     };
 
     // vehicle
+    this.raceCarControl = true;
     this.speedFactor = 0.5;
     this.sizeFactor = 1.5;
     this.vehicle = new MyVehicle(this, 3, 3);
@@ -82,16 +83,27 @@ class MyScene extends CGFscene {
   }
 
   checkKeys() {
-    // TODO map setas multi set
-    if (this.vehicle.v > 0) {
-      this.vehicle.v -= 0.03 * this.speedFactor;
-      if (this.vehicle.v > 0.5 * this.speedFactor)
-        this.vehicle.v = 0.5 * this.speedFactor;
-    } else if (this.vehicle.v < 0) this.vehicle.v = 0;
+    if (this.raceCarControl) {
+      if (this.vehicle.v > 0) {
+        this.vehicle.v -= 0.03 * this.speedFactor;
+        if (this.vehicle.v > 0.5 * this.speedFactor)
+          this.vehicle.v = 0.5 * this.speedFactor;
+      } else if (this.vehicle.v < 0) {
+        this.vehicle.v = 0;
+      }
 
-    // Check for key codes e.g. in https://keycode.info/
-    if (this.gui.isKeyPressed(0 + "KeyW")) this.vehicle.v += 0.1 * this.speedFactor;
-    if (this.gui.isKeyPressed(0 + "KeyS")) this.vehicle.v -= 0.5 * this.speedFactor;
+      if (this.gui.isKeyPressed(0 + "KeyW"))
+        this.vehicle.v += 0.1 * this.speedFactor;
+      if (this.gui.isKeyPressed(0 + "KeyS"))
+        this.vehicle.v -= 0.5 * this.speedFactor;
+    } else {
+      if (this.gui.isKeyPressed(0 + "KeyW"))
+        this.vehicle.v += 0.1 * this.speedFactor;
+      if (this.gui.isKeyPressed(0 + "KeyS"))
+        this.vehicle.v -= 0.1 * this.speedFactor;
+      if (this.vehicle.v < 0) this.vehicle.v = 0;
+    }
+
     if (this.gui.isKeyPressed(0 + "KeyA")) this.vehicle.ang += 0.1;
     if (this.gui.isKeyPressed(0 + "KeyD")) this.vehicle.ang -= 0.1;
   }
