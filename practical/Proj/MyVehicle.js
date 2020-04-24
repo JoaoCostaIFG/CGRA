@@ -1,22 +1,67 @@
 /**
- * MyVehicle
+ * MyVehicle (Kirov)
  * @constructor
  */
 class MyVehicle extends CGFobject {
-  constructor(scene, slices, stacks) {
+  constructor(scene) {
     super(scene);
 
     /* pos */
     this.ang = 0;
-    this.pos = [0, 0, -0.5];
+    this.pos = [0, 10, 0];
     this.v = 0;
 
-    this.slices = slices;
-    this.stacks = stacks;
+    /* animation */
+    this.currTime = 0;
+    this.turbineRot = 0;
+    this.vertStab = 0;
+    this.rotated = false;
+    this.autoPilot = false;
+
+    this.sphere = new MySphere(scene, 20, 20);
+    this.cil = new MyCilinder(scene, 20);
+    this.stabilizer = new MyPlaneTriangle(scene);
+
+    this.kirovMaterial = new CGFappearance(scene);
+    this.kirovTexture = new CGFtexture(scene, "images/not_kirov.jpg");
+    this.kirovMaterial.setTexture(this.kirovTexture);
+
     this.initBuffers();
   }
 
-  update() {
+  isAutoPilot() {
+    return this.autoPilot;
+  }
+
+  toggleAutoPilot() {
+    this.autoPilot = !this.autoPilot;
+    this.v = 0;
+  }
+
+  updateAutoPilot(t) {
+    var delta = (t - this.currTime) / 1000;
+    this.v = 2 * Math.PI * delta;
+    this.turnLeft((2 * delta * Math.PI) / 5);
+  }
+
+  turnLeft(amount) {
+    this.ang += amount;
+    if (this.vertStab > -Math.PI / 6) this.vertStab -= Math.PI / 128;
+
+    this.rotated = true;
+  }
+
+  turnRight(amount) {
+    this.ang -= amount;
+    if (this.vertStab < Math.PI / 6) this.vertStab += Math.PI / 128;
+
+    this.rotated = true;
+  }
+
+  update(t) {
+    if (this.currTime == 0) this.currTime = t;
+    if (this.autoPilot) this.updateAutoPilot(t);
+
     this.velocity = [
       Math.sin(this.ang) * this.v,
       0,
@@ -26,71 +71,115 @@ class MyVehicle extends CGFobject {
     this.pos[0] += this.velocity[0];
     this.pos[1] += this.velocity[1];
     this.pos[2] += this.velocity[2];
-  }
 
-  initBuffers() {
-    this.vertices = [];
-    this.indices = [];
-    this.normals = [];
+    this.turbineRot += Math.PI / 16 + this.v;
 
-    var ang = 0;
-    var alphaAng = (2 * Math.PI) / this.slices;
-
-    for (var i = 0; i < this.slices; i++) {
-      // All vertices have to be declared for a given face
-      // even if they are shared with others, as the normals
-      // in each face will be different
-
-      var sa = Math.sin(ang);
-      var saa = Math.sin(ang + alphaAng);
-      var ca = Math.cos(ang);
-      var caa = Math.cos(ang + alphaAng);
-
-      this.vertices.push(0, 1, 0);
-      this.vertices.push(ca, 0, -sa);
-      this.vertices.push(caa, 0, -saa);
-
-      // triangle normal computed by cross product of two edges
-      var normal = [saa - sa, ca * saa - sa * caa, caa - ca];
-
-      // normalization
-      var nsize = Math.sqrt(
-        normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]
-      );
-      normal[0] /= nsize;
-      normal[1] /= nsize;
-      normal[2] /= nsize;
-
-      // push normal once for each vertex of this triangle
-      this.normals.push(...normal);
-      this.normals.push(...normal);
-      this.normals.push(...normal);
-
-      this.indices.push(3 * i, 3 * i + 1, 3 * i + 2);
-
-      ang += alphaAng;
+    if (!this.rotated) {
+      if (Math.abs(this.vertStab) < 0.1) this.vertStab = 0;
+      else if (this.vertStab < 0) this.vertStab += Math.PI / 64;
+      else if (this.vertStab > 0) this.vertStab -= Math.PI / 64;
     }
+    this.rotated = false;
 
-    this.primitiveType = this.scene.gl.TRIANGLES;
-    this.initGLBuffers();
+    this.currTime = t;
   }
 
-  updateBuffers(complexity) {
-    this.slices = 3 + Math.round(9 * complexity); //complexity varies 0-1, so slices varies 3-12
-
-    // reinitialize buffers
-    this.initBuffers();
-    this.initNormalVizBuffers();
-  }
+  updateBuffers() {}
 
   display() {
-    this.update();
+    this.kirovMaterial.apply();
 
     this.scene.pushMatrix();
     this.scene.translate(this.pos[0], this.pos[1], this.pos[2]);
     this.scene.rotate(this.ang, 0, 1, 0);
+
+    /* draw body */
+    this.scene.pushMatrix();
+    this.scene.scale(1, 1, 2);
+    this.sphere.display();
+    this.scene.popMatrix();
+
+    /* draw passengerPlace */
+    this.scene.pushMatrix();
+    this.scene.translate(0, -1.1, -0.75);
+    this.scene.scale(0.2, 0.2, 1.5);
     this.scene.rotate(Math.PI / 2, 1, 0, 0);
-    super.display();
+    this.cil.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+    this.scene.translate(0, -1.1, -0.75);
+    this.scene.scale(0.2, 0.2, 0.2);
+    this.sphere.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+    this.scene.translate(0, -1.1, 0.75);
+    this.scene.scale(0.2, 0.2, 0.2);
+    this.sphere.display();
+    this.scene.popMatrix();
+
+    /* passenger turbines */
+    this.scene.pushMatrix();
+    this.scene.translate(0.2, -1.1, -0.8);
+    this.scene.scale(0.1, 0.1, 0.3);
+    this.sphere.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+    this.scene.translate(-0.2, -1.1, -0.8);
+    this.scene.scale(0.1, 0.1, 0.3);
+    this.sphere.display();
+    this.scene.popMatrix();
+
+    /* turbine helices */
+    this.scene.pushMatrix();
+    this.scene.translate(0.2, -1.1, -1.1);
+    this.scene.rotate(this.turbineRot, 0, 0, 1);
+    this.scene.scale(0.05, 0.2, 0.01);
+    this.sphere.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+    this.scene.translate(-0.2, -1.1, -1.1);
+    this.scene.rotate(this.turbineRot, 0, 0, 1);
+    this.scene.scale(0.05, 0.2, 0.01);
+    this.sphere.display();
+    this.scene.popMatrix();
+
+    /* vertical stabilizers */
+    this.scene.pushMatrix();
+    this.scene.translate(this.vertStab, 0.8, -2);
+    this.scene.rotate(-Math.PI / 2 - this.vertStab, 0, 1, 0);
+    this.scene.scale(0.8, 0.8, 0);
+    this.stabilizer.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+    this.scene.translate(this.vertStab, -0.8, -2);
+    this.scene.rotate(Math.PI, 0, 0, 1);
+    this.scene.rotate(-Math.PI / 2 + this.vertStab, 0, 1, 0);
+    this.scene.scale(0.8, 0.8, 0);
+    this.stabilizer.display();
+    this.scene.popMatrix();
+
+    /* horizontal stabilizers */
+    this.scene.pushMatrix();
+    this.scene.translate(0.8, 0, -2);
+    this.scene.rotate(-Math.PI / 2, 0, 0, 1);
+    this.scene.rotate(-Math.PI / 2, 0, 1, 0);
+    this.scene.scale(0.8, 0.8, 0);
+    this.stabilizer.display();
+    this.scene.popMatrix();
+
+    this.scene.pushMatrix();
+    this.scene.translate(-0.8, 0, -2);
+    this.scene.rotate(Math.PI / 2, 0, 0, 1);
+    this.scene.rotate(-Math.PI / 2, 0, 1, 0);
+    this.scene.scale(0.8, 0.8, 0);
+    this.stabilizer.display();
+    this.scene.popMatrix();
+
     this.scene.popMatrix();
   }
 }

@@ -1,8 +1,8 @@
 /**
- * ToplessCilinder
+ * MyCilinder
  * @constructor
  */
-class ToplessCilinder extends CGFobject {
+class MyCilinder extends CGFobject {
   constructor(scene, slices) {
     super(scene);
     this.slices = slices;

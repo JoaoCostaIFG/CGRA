@@ -79,10 +79,15 @@ class MyScene extends CGFscene {
   }
   // called periodically (as per setUpdatePeriod() in init())
   update(t) {
-    //To be done...
+    this.vehicle.update(t);
   }
 
   checkKeys() {
+    if (this.vehicle.isAutoPilot()) {
+      if (this.gui.isKeyPressed(0 + "KeyR")) this.vehicle.toggleAutoPilot();
+      return;
+    }
+
     if (this.raceCarControl) {
       if (this.vehicle.v > 0) {
         this.vehicle.v -= 0.03 * this.speedFactor;
@@ -104,8 +109,9 @@ class MyScene extends CGFscene {
       if (this.vehicle.v < 0) this.vehicle.v = 0;
     }
 
-    if (this.gui.isKeyPressed(0 + "KeyA")) this.vehicle.ang += 0.1;
-    if (this.gui.isKeyPressed(0 + "KeyD")) this.vehicle.ang -= 0.1;
+    if (this.gui.isKeyPressed(0 + "KeyP")) this.vehicle.toggleAutoPilot();
+    if (this.gui.isKeyPressed(0 + "KeyA")) this.vehicle.turnLeft(0.1);
+    if (this.gui.isKeyPressed(0 + "KeyD")) this.vehicle.turnRight(0.1);
   }
 
   display() {
@@ -133,19 +139,22 @@ class MyScene extends CGFscene {
     this.cubemapMaterial.apply();
     this.cubemap.display();
 
-    // Vehicle
+    /* Vehicle */
+    // scale vehicle
     this.pushMatrix();
-    this.translate(
-      this.vehicle.pos[0],
-      this.vehicle.pos[1],
-      this.vehicle.pos[2]
-    );
-    this.scale(this.sizeFactor, this.sizeFactor, this.sizeFactor);
-    this.translate(
-      -this.vehicle.pos[0],
-      -this.vehicle.pos[1],
-      -this.vehicle.pos[2]
-    );
+    /*
+     * this.translate(
+     *   this.vehicle.pos[0],
+     *   this.vehicle.pos[1],
+     *   this.vehicle.pos[2]
+     * );
+     * this.scale(this.sizeFactor, this.sizeFactor, this.sizeFactor);
+     * this.translate(
+     *   -this.vehicle.pos[0],
+     *   -this.vehicle.pos[1],
+     *   -this.vehicle.pos[2]
+     * );
+     */
     this.vehicle.display();
     this.popMatrix();
 
