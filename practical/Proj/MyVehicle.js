@@ -22,9 +22,17 @@ class MyVehicle extends CGFobject {
     this.cil = new MyCilinder(scene, 20);
     this.stabilizer = new MyPlaneTriangle(scene);
 
-    this.kirovMaterial = new CGFappearance(scene);
-    this.kirovTexture = new CGFtexture(scene, "images/not_kirov.jpg");
-    this.kirovMaterial.setTexture(this.kirovTexture);
+    /* textures */
+    this.kirovBodyTex = new CGFappearance(scene);
+    this.kirovBodyTex.setTexture(new CGFtexture(scene, "images/kirov/kirov_body.png"));
+    this.kirovStabTex = new CGFappearance(scene);
+    this.kirovStabTex.setTexture(new CGFtexture(scene, "images/kirov/kirov_stabilizer.png"));
+    this.kirovDoorTex = new CGFappearance(scene);
+    this.kirovDoorTex.setTexture(new CGFtexture(scene, "images/kirov/kirov_door.png"));
+    this.kirovPlainTex = new CGFappearance(scene);
+    this.kirovPlainTex.setTexture(new CGFtexture(scene, "images/kirov/kirov_plain.png"));
+    this.kirovHeliceTex = new CGFappearance(scene);
+    this.kirovHeliceTex.setTexture(new CGFtexture(scene, "images/kirov/kirov_helice.png"));
 
     this.initBuffers();
   }
@@ -87,25 +95,27 @@ class MyVehicle extends CGFobject {
   updateBuffers() {}
 
   display() {
-    this.kirovMaterial.apply();
-
     this.scene.pushMatrix();
     this.scene.translate(this.pos[0], this.pos[1], this.pos[2]);
     this.scene.rotate(this.ang, 0, 1, 0);
 
     /* draw body */
+    this.kirovBodyTex.apply();
     this.scene.pushMatrix();
     this.scene.scale(1, 1, 2);
     this.sphere.display();
     this.scene.popMatrix();
 
     /* draw passengerPlace */
+    this.kirovDoorTex.apply();
     this.scene.pushMatrix();
     this.scene.translate(0, -1.1, -0.75);
     this.scene.scale(0.2, 0.2, 1.5);
     this.scene.rotate(Math.PI / 2, 1, 0, 0);
     this.cil.display();
     this.scene.popMatrix();
+
+    this.kirovPlainTex.apply();
 
     this.scene.pushMatrix();
     this.scene.translate(0, -1.1, -0.75);
@@ -133,6 +143,8 @@ class MyVehicle extends CGFobject {
     this.scene.popMatrix();
 
     /* turbine helices */
+    this.kirovHeliceTex.apply();
+
     this.scene.pushMatrix();
     this.scene.translate(0.2, -1.1, -1.1);
     this.scene.rotate(this.turbineRot, 0, 0, 1);
@@ -142,12 +154,14 @@ class MyVehicle extends CGFobject {
 
     this.scene.pushMatrix();
     this.scene.translate(-0.2, -1.1, -1.1);
-    this.scene.rotate(this.turbineRot, 0, 0, 1);
+    this.scene.rotate(-this.turbineRot, 0, 0, 1);
     this.scene.scale(0.05, 0.2, 0.01);
     this.sphere.display();
     this.scene.popMatrix();
 
     /* vertical stabilizers */
+    this.kirovStabTex.apply();
+
     this.scene.pushMatrix();
     this.scene.translate(this.vertStab, 0.8, -2);
     this.scene.rotate(-Math.PI / 2 - this.vertStab, 0, 1, 0);

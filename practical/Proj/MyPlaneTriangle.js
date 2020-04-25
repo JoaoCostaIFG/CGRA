@@ -28,9 +28,9 @@ class MyPlaneTriangle extends CGFobject {
       0, 2, 3,
       1, 4, 2,
       
-      7, 6, 5,
-      8, 7, 5,
-      7, 9, 6,
+      2, 1, 0,
+      3, 2, 0,
+      2, 4, 1,
     ];
     this.normals = [];
     for (var i = 0; i < 5; ++i)

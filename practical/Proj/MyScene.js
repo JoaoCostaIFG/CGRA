@@ -142,19 +142,17 @@ class MyScene extends CGFscene {
     /* Vehicle */
     // scale vehicle
     this.pushMatrix();
-    /*
-     * this.translate(
-     *   this.vehicle.pos[0],
-     *   this.vehicle.pos[1],
-     *   this.vehicle.pos[2]
-     * );
-     * this.scale(this.sizeFactor, this.sizeFactor, this.sizeFactor);
-     * this.translate(
-     *   -this.vehicle.pos[0],
-     *   -this.vehicle.pos[1],
-     *   -this.vehicle.pos[2]
-     * );
-     */
+    this.translate(
+      this.vehicle.pos[0],
+      this.vehicle.pos[1],
+      this.vehicle.pos[2]
+    );
+    this.scale(this.sizeFactor, this.sizeFactor, this.sizeFactor);
+    this.translate(
+      -this.vehicle.pos[0],
+      -this.vehicle.pos[1],
+      -this.vehicle.pos[2]
+    );
     this.vehicle.display();
     this.popMatrix();
 
