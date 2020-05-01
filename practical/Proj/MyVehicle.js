@@ -3,8 +3,15 @@
  * @constructor
  */
 class MyVehicle extends CGFobject {
-  constructor(scene) {
+  constructor(scene, maxSupplies) {
     super(scene);
+
+    /* supplies */
+    this.maxSupplies = maxSupplies || 5;
+    this.supplyNum = 0;
+    this.supplies = [];
+    for (var i = 0; i < this.maxSupplies; ++i)
+      this.supplies.push(new MySupply(scene));
 
     /* pos */
     this.ang = 0;
@@ -24,21 +31,47 @@ class MyVehicle extends CGFobject {
 
     /* textures */
     this.kirovBodyTex = new CGFappearance(scene);
-    this.kirovBodyTex.setTexture(new CGFtexture(scene, "images/kirov/kirov_body.png"));
+    this.kirovBodyTex.setTexture(
+      new CGFtexture(scene, "images/kirov/kirov_body.png")
+    );
     this.kirovStabTex = new CGFappearance(scene);
-    this.kirovStabTex.setTexture(new CGFtexture(scene, "images/kirov/kirov_stabilizer.png"));
+    this.kirovStabTex.setTexture(
+      new CGFtexture(scene, "images/kirov/kirov_stabilizer.png")
+    );
     this.kirovDoorTex = new CGFappearance(scene);
-    this.kirovDoorTex.setTexture(new CGFtexture(scene, "images/kirov/kirov_door.png"));
+    this.kirovDoorTex.setTexture(
+      new CGFtexture(scene, "images/kirov/kirov_door.png")
+    );
     this.kirovPlainTex = new CGFappearance(scene);
-    this.kirovPlainTex.setTexture(new CGFtexture(scene, "images/kirov/kirov_plain.png"));
+    this.kirovPlainTex.setTexture(
+      new CGFtexture(scene, "images/kirov/kirov_plain.png")
+    );
     this.kirovHeliceTex = new CGFappearance(scene);
-    this.kirovHeliceTex.setTexture(new CGFtexture(scene, "images/kirov/kirov_helice.png"));
+    this.kirovHeliceTex.setTexture(
+      new CGFtexture(scene, "images/kirov/kirov_helice.png")
+    );
 
     this.initBuffers();
   }
 
+  dropSupply() {
+    if (this.supplyNum >= this.maxSupplies) return;
+
+    this.supplies[this.supplyNum++].drop(this.pos);
+  }
+
   isAutoPilot() {
     return this.autoPilot;
+  }
+
+  resetSupplies() {
+    // clear all supplies when autopilot is set
+    /*
+     * for (var i = 0; i < this.supplyNum; ++i)
+     *   delete this.supplies[i];
+     */
+    for (var i = 0; i < this.maxSupplies; ++i) this.supplies[i].reset();
+    this.supplyNum = 0;
   }
 
   toggleAutoPilot() {
@@ -70,6 +103,10 @@ class MyVehicle extends CGFobject {
     if (this.currTime == 0) this.currTime = t;
     if (this.autoPilot) this.updateAutoPilot(t);
 
+    for (var i = 0; i < this.maxSupplies; ++i) {
+      this.supplies[i].update(t);
+    }
+
     this.velocity = [
       Math.sin(this.ang) * this.v,
       0,
@@ -92,10 +129,17 @@ class MyVehicle extends CGFobject {
     this.currTime = t;
   }
 
-  updateBuffers() {}
+  display(sizeFactor) {
+    for (var i = 0; i < this.supplyNum; ++i) {
+      this.supplies[i].display();
+    }
 
-  display() {
     this.scene.pushMatrix();
+    // scale
+    this.scene.translate(this.pos[0], this.pos[1], this.pos[2]);
+    this.scene.scale(sizeFactor, sizeFactor, sizeFactor);
+    this.scene.translate(-this.pos[0], -this.pos[1], -this.pos[2]);
+    // set correct position and facing angle
     this.scene.translate(this.pos[0], this.pos[1], this.pos[2]);
     this.scene.rotate(this.ang, 0, 1, 0);
 
@@ -194,6 +238,6 @@ class MyVehicle extends CGFobject {
     this.stabilizer.display();
     this.scene.popMatrix();
 
-    this.scene.popMatrix();
+    this.scene.popMatrix(); // set correct position and facing angle (pop)
   }
 }

@@ -19,7 +19,7 @@ class MyScene extends CGFscene {
     this.gl.enable(this.gl.CULL_FACE);
     this.gl.depthFunc(this.gl.LEQUAL);
 
-    this.setUpdatePeriod(50);
+    this.setUpdatePeriod(20);
 
     this.enableTextures(true);
 
@@ -46,11 +46,15 @@ class MyScene extends CGFscene {
       "Hardware Store": 3,
     };
 
+    // terrain shader
+    this.terrain = new MyTerrain(this, 50, 8);
+
     // vehicle
-    this.raceCarControl = true;
+    this.raceCarControl = false;
     this.speedFactor = 0.5;
     this.sizeFactor = 1.5;
-    this.vehicle = new MyVehicle(this, 3, 3);
+    this.dropCD = 0;
+    this.vehicle = new MyVehicle(this, 5);
 
     //Objects connected to MyInterface
     this.displayAxis = true;
@@ -80,38 +84,53 @@ class MyScene extends CGFscene {
   // called periodically (as per setUpdatePeriod() in init())
   update(t) {
     this.vehicle.update(t);
+    if (this.dropCD > 0) --this.dropCD;
+  }
+
+  raceCarKeys() {
+    if (this.vehicle.v > 0) {
+      this.vehicle.v -= 0.03 * this.speedFactor;
+      if (this.vehicle.v > 0.5 * this.speedFactor)
+        this.vehicle.v = 0.5 * this.speedFactor;
+    } else if (this.vehicle.v < 0) {
+      this.vehicle.v = 0;
+    }
+
+    if (this.gui.isKeyPressed(0 + "KeyW"))
+      this.vehicle.v += 0.1 * this.speedFactor;
+    if (this.gui.isKeyPressed(0 + "KeyS"))
+      this.vehicle.v -= 0.5 * this.speedFactor;
+  }
+
+  zeppelinKeys() {
+    if (this.gui.isKeyPressed(0 + "KeyW"))
+      this.vehicle.v += 0.1 * this.speedFactor;
+    if (this.gui.isKeyPressed(0 + "KeyS"))
+      this.vehicle.v -= 0.1 * this.speedFactor;
+    if (this.vehicle.v < 0) this.vehicle.v = 0;
   }
 
   checkKeys() {
     if (this.vehicle.isAutoPilot()) {
-      if (this.gui.isKeyPressed(0 + "KeyR")) this.vehicle.toggleAutoPilot();
+      if (this.gui.isKeyPressed(0 + "KeyR")) {
+        this.vehicle.resetSupplies();
+        this.vehicle.toggleAutoPilot();
+      }
       return;
     }
 
-    if (this.raceCarControl) {
-      if (this.vehicle.v > 0) {
-        this.vehicle.v -= 0.03 * this.speedFactor;
-        if (this.vehicle.v > 0.5 * this.speedFactor)
-          this.vehicle.v = 0.5 * this.speedFactor;
-      } else if (this.vehicle.v < 0) {
-        this.vehicle.v = 0;
-      }
-
-      if (this.gui.isKeyPressed(0 + "KeyW"))
-        this.vehicle.v += 0.1 * this.speedFactor;
-      if (this.gui.isKeyPressed(0 + "KeyS"))
-        this.vehicle.v -= 0.5 * this.speedFactor;
-    } else {
-      if (this.gui.isKeyPressed(0 + "KeyW"))
-        this.vehicle.v += 0.1 * this.speedFactor;
-      if (this.gui.isKeyPressed(0 + "KeyS"))
-        this.vehicle.v -= 0.1 * this.speedFactor;
-      if (this.vehicle.v < 0) this.vehicle.v = 0;
-    }
+    // parse velocity controls
+    if (this.raceCarControl) this.raceCarKeys();
+    else this.zeppelinKeys();
 
     if (this.gui.isKeyPressed(0 + "KeyP")) this.vehicle.toggleAutoPilot();
+    if (this.gui.isKeyPressed(0 + "KeyR")) this.vehicle.resetSupplies();
     if (this.gui.isKeyPressed(0 + "KeyA")) this.vehicle.turnLeft(0.1);
     if (this.gui.isKeyPressed(0 + "KeyD")) this.vehicle.turnRight(0.1);
+    if (this.gui.isKeyPressed(0 + "KeyL") && this.dropCD <= 0) {
+      this.dropCD = 30;
+      this.vehicle.dropSupply();
+    }
   }
 
   display() {
@@ -139,22 +158,15 @@ class MyScene extends CGFscene {
     this.cubemapMaterial.apply();
     this.cubemap.display();
 
-    /* Vehicle */
-    // scale vehicle
+    // terrain
     this.pushMatrix();
-    this.translate(
-      this.vehicle.pos[0],
-      this.vehicle.pos[1],
-      this.vehicle.pos[2]
-    );
-    this.scale(this.sizeFactor, this.sizeFactor, this.sizeFactor);
-    this.translate(
-      -this.vehicle.pos[0],
-      -this.vehicle.pos[1],
-      -this.vehicle.pos[2]
-    );
-    this.vehicle.display();
+    this.translate(0, -24.99, 0);
+    this.rotate(-Math.PI / 2, 1, 0, 0);
+    this.terrain.display();
     this.popMatrix();
+
+    /* Vehicle */
+    this.vehicle.display(this.sizeFactor);
 
     // ---- END Primitive drawing section
   }
