@@ -52,9 +52,13 @@ class MyScene extends CGFscene {
     // vehicle
     this.raceCarControl = false;
     this.speedFactor = 0.5;
-    this.sizeFactor = 1.5;
+    this.sizeFactor = 1.0;
     this.dropCD = 0;
     this.vehicle = new MyVehicle(this, 5);
+
+    // billboard
+    this.nSuppliesDelivered = 0;
+    this.billboard = new MyBillboard(this);
 
     //Objects connected to MyInterface
     this.displayAxis = true;
@@ -113,6 +117,7 @@ class MyScene extends CGFscene {
   checkKeys() {
     if (this.vehicle.isAutoPilot()) {
       if (this.gui.isKeyPressed(0 + "KeyR")) {
+        this.nSuppliesDelivered = 0;
         this.vehicle.resetSupplies();
         this.vehicle.toggleAutoPilot();
       }
@@ -123,11 +128,15 @@ class MyScene extends CGFscene {
     if (this.raceCarControl) this.raceCarKeys();
     else this.zeppelinKeys();
 
-    if (this.gui.isKeyPressed(0 + "KeyP")) this.vehicle.toggleAutoPilot();
-    if (this.gui.isKeyPressed(0 + "KeyR")) this.vehicle.resetSupplies();
     if (this.gui.isKeyPressed(0 + "KeyA")) this.vehicle.turnLeft(0.1);
     if (this.gui.isKeyPressed(0 + "KeyD")) this.vehicle.turnRight(0.1);
+    if (this.gui.isKeyPressed(0 + "KeyP")) this.vehicle.toggleAutoPilot();
+    if (this.gui.isKeyPressed(0 + "KeyR")) {
+      this.nSuppliesDelivered = 0;
+      this.vehicle.resetSupplies();
+    }
     if (this.gui.isKeyPressed(0 + "KeyL") && this.dropCD <= 0) {
+      ++this.nSuppliesDelivered;
       this.dropCD = 30;
       this.vehicle.dropSupply();
     }
@@ -153,21 +162,23 @@ class MyScene extends CGFscene {
 
     // ---- BEGIN Primitive drawing section
 
-    // Cubemap
+    /* Cubemap */
     this.cubemapMaterial.setTexture(this.cubemapTexs[this.selectedCubemap]);
     this.cubemapMaterial.apply();
     this.cubemap.display();
 
-    // terrain
+    /* terrain */
     this.pushMatrix();
     // this.translate(0, -24.99, 0);
     this.rotate(-Math.PI / 2, 1, 0, 0);
     this.terrain.display();
     this.popMatrix();
 
-    /* Vehicle */
-    this.vehicle.display(this.sizeFactor);
+    /* billboard */
+    this.billboard.display(this.nSuppliesDelivered / 5.0);
 
+    /* vehicle */
+    this.vehicle.display(this.sizeFactor);
     // ---- END Primitive drawing section
   }
 }

@@ -28,9 +28,9 @@ class MyPlaneTriangle extends CGFobject {
       0, 2, 3,
       1, 4, 2,
       
-      2, 1, 0,
-      3, 2, 0,
-      2, 4, 1,
+      7, 6, 5,
+      8, 7, 5,
+      7, 9, 6,
     ];
     this.normals = [];
     for (var i = 0; i < 5; ++i)
@@ -52,7 +52,7 @@ class MyPlaneTriangle extends CGFobject {
 			1, 1,
 		];
 
-    this.primitiveType = this.scene.gl.TRIANGLE_STRIP;
+    this.primitiveType = this.scene.gl.TRIANGLES;
     this.initGLBuffers();
   }
 }

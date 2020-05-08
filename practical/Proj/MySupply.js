@@ -45,7 +45,7 @@ class MySupply extends CGFobject {
 
   land() {
     if (this.pos[1] <= 0) {
-      this.pos[1] = 0;
+      this.pos[1] = 0.1;
       this.state = this.SupplyStates.LANDED;
     }
   }
