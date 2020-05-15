@@ -72,28 +72,3 @@ class MyCilinder extends CGFobject {
     this.initNormalVizBuffers();
   }
 }
-
-/*
- *     for (var i = 0; i < this.slices * 4; i += 4) {
- *       // this is vertice 0
- *       this.vertices.push(Math.cos(ang), 0, -Math.sin(ang));
- *       this.normals.push(Math.cos(ang), 0, -Math.sin(ang));
- *
- *       // this is vertice 1
- *       this.vertices.push(Math.cos(ang), 1, -Math.sin(ang));
- *       this.normals.push(Math.cos(ang), 0, -Math.sin(ang));
- *
- *       // this is vertice 2
- *       ang += alphaAng;
- *       this.vertices.push(Math.cos(ang), 0, -Math.sin(ang));
- *       this.normals.push(Math.cos(ang), 0, -Math.sin(ang));
- *
- *       // this is vertice 3
- *       this.vertices.push(Math.cos(ang), 1, -Math.sin(ang));
- *       this.normals.push(Math.cos(ang), 0, -Math.sin(ang));
- *
- *       // these are the triangles: 0-1-2 and 1-3-2
- *       this.indices.push(i, i + 2, i + 1);
- *       this.indices.push(i + 2, i + 3, i + 1);
- *     }
- */

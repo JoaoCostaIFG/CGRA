@@ -26,17 +26,7 @@ class MyVehicle extends CGFobject {
     this.autoPilot = false;
 
     /* flag */
-    this.flag_t = 0.0;
-    this.flag = new MyPlane(scene, 20);
-    this.flagShader = new CGFshader(
-      this.scene.gl,
-      "shaders/flag.vert",
-      "shaders/flag.frag"
-    );
-    this.kirovFlagTex = new CGFappearance(scene);
-    this.kirovFlagTex.setTexture(
-      new CGFtexture(scene, "images/kirov/kirov_flag.png")
-    );
+    this.flag = new MyFlag(scene, 6.0, 0.1);
 
     /* basic objs */
     this.sphere = new MySphere(scene, 20, 20);
@@ -110,7 +100,7 @@ class MyVehicle extends CGFobject {
   }
 
   update(t) {
-    if (this.currTime == 0) this.currTime = t;
+    if (this.currTime == 0) this.currTime = t; // special case for the first update
     if (this.autoPilot) this.updateAutoPilot(t);
 
     for (var i = 0; i < this.maxSupplies; ++i) {
@@ -123,9 +113,12 @@ class MyVehicle extends CGFobject {
       Math.cos(this.ang) * this.v,
     ];
 
-    this.pos[0] += this.velocity[0];
-    this.pos[1] += this.velocity[1];
-    this.pos[2] += this.velocity[2];
+    /* COMMENT THIS TO STOP MOVEMENT (GOOD FOR CHECKING ANIMATIONS) */
+    /*
+     * this.pos[0] += this.velocity[0];
+     * this.pos[1] += this.velocity[1];
+     * this.pos[2] += this.velocity[2];
+     */
 
     this.turbineRot += Math.PI / 16 + this.v;
 
@@ -137,68 +130,7 @@ class MyVehicle extends CGFobject {
     this.rotated = false;
 
     this.currTime = t;
-  }
-
-  flagDisplay() {
-    this.flag_t += Math.PI / 256;
-    this.flagShader.setUniformsValues({ t: this.flag_t });
-    this.flagShader.setUniformsValues({ s: this.v });
-
-    /* side 1 */
-    this.flagShader.setUniformsValues({ intensity: 0.1 });
-    this.scene.setActiveShader(this.flagShader);
-    this.kirovPlainTex.apply();
-    /* fio 1 */
-    this.scene.pushMatrix();
-    this.scene.translate(0, 0.25, -2);
-    this.scene.rotate(Math.PI / 2, 0, 1, 0);
-    this.scene.scale(2, 0.05, 1);
-    this.flag.display();
-    this.scene.popMatrix();
-    /* fio 2 */
-    this.scene.pushMatrix();
-    this.scene.translate(0, -0.25, -2);
-    this.scene.rotate(Math.PI / 2, 0, 1, 0);
-    this.scene.scale(2, 0.05, 1);
-    this.flag.display();
-    this.scene.popMatrix();
-    /* flagueta */
-    this.kirovFlagTex.apply();
-    this.scene.pushMatrix();
-    this.scene.translate(0, 0, -4.5);
-    this.scene.rotate(Math.PI / 2, 0, 1, 0);
-    this.scene.scale(3, 1, 1);
-    this.flag.display();
-    this.scene.popMatrix();
-
-    /* side 2 */
-    this.flagShader.setUniformsValues({ intensity: -0.1 });
-    this.scene.setActiveShader(this.flagShader);
-    this.kirovPlainTex.apply();
-    /* fio 1 */
-    this.scene.pushMatrix();
-    this.scene.translate(0, 0.25, -2);
-    this.scene.rotate(-Math.PI / 2, 0, 1, 0);
-    this.scene.scale(2, 0.05, 1);
-    this.flag.display();
-    this.scene.popMatrix();
-    /* fio 2 */
-    this.scene.pushMatrix();
-    this.scene.translate(0, -0.25, -2);
-    this.scene.rotate(-Math.PI / 2, 0, 1, 0);
-    this.scene.scale(2, 0.05, 1);
-    this.flag.display();
-    this.scene.popMatrix();
-    /* flagueta */
-    this.kirovFlagTex.apply();
-    this.scene.pushMatrix();
-    this.scene.translate(0, 0, -4.5);
-    this.scene.rotate(-Math.PI / 2, 0, 1, 0);
-    this.scene.scale(3, 1, 1);
-    this.flag.display();
-    this.scene.popMatrix();
-
-    this.scene.setActiveShader(this.scene.defaultShader);
+    this.flag.update(t, this.v);
   }
 
   display(sizeFactor) {
@@ -309,7 +241,7 @@ class MyVehicle extends CGFobject {
     this.scene.popMatrix();
 
     /* flag */
-    this.flagDisplay();
+    this.flag.display();
 
     this.scene.popMatrix(); // set correct position and facing angle (pop)
   }
