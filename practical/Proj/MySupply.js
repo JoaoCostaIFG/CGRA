@@ -54,7 +54,6 @@ class MySupply extends CGFobject {
     this.pos[0] = dropPosition[0];
     this.pos[1] = dropPosition[1];
     this.pos[2] = dropPosition[2];
-    // this.pos = dropPosition.slice();
 
     this.startFallTime = this.currTime;
     this.fallHeight = this.pos[1];

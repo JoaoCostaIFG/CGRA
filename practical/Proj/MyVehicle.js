@@ -20,13 +20,14 @@ class MyVehicle extends CGFobject {
 
     /* animation */
     this.currTime = 0;
-    this.turbineRot = 0;
     this.vertStab = 0;
     this.rotated = false;
     this.autoPilot = false;
 
+    /* gondola */
+    this.gondola = new MyVehicleGondola(scene);
     /* flag */
-    this.flag = new MyFlag(scene, 6.0, 0.1);
+    this.flag = new MyFlag(scene, 2.0, 0.15);
 
     /* basic objs */
     this.sphere = new MySphere(scene, 20, 20);
@@ -35,24 +36,14 @@ class MyVehicle extends CGFobject {
 
     /* textures */
     this.kirovBodyTex = new CGFappearance(scene);
+    this.kirovBodyTex.setSpecular(0.1, 0.1, 0.1, 1);
     this.kirovBodyTex.setTexture(
       new CGFtexture(scene, "images/kirov/kirov_body.png")
     );
     this.kirovStabTex = new CGFappearance(scene);
+    this.kirovStabTex.setSpecular(0.8, 0.8, 0.8, 1);
     this.kirovStabTex.setTexture(
       new CGFtexture(scene, "images/kirov/kirov_stabilizer.png")
-    );
-    this.kirovDoorTex = new CGFappearance(scene);
-    this.kirovDoorTex.setTexture(
-      new CGFtexture(scene, "images/kirov/kirov_door.png")
-    );
-    this.kirovPlainTex = new CGFappearance(scene);
-    this.kirovPlainTex.setTexture(
-      new CGFtexture(scene, "images/kirov/kirov_plain.png")
-    );
-    this.kirovHeliceTex = new CGFappearance(scene);
-    this.kirovHeliceTex.setTexture(
-      new CGFtexture(scene, "images/kirov/kirov_helice.png")
     );
 
     this.initBuffers();
@@ -64,25 +55,28 @@ class MyVehicle extends CGFobject {
     this.supplies[this.supplyNum++].drop(this.pos);
   }
 
-  isAutoPilot() {
-    return this.autoPilot;
-  }
-
-  resetSupplies() {
+  reset() {
     // clear all supplies when autopilot is set
     for (var i = 0; i < this.maxSupplies; ++i) this.supplies[i].reset();
     this.supplyNum = 0;
-  }
 
-  toggleAutoPilot() {
-    this.autoPilot = !this.autoPilot;
+    // reset vehicle pos
+    this.ang = 0;
+    this.pos = [0, 10, 0];
     this.v = 0;
+
+    // reset autopilot state
+    if (this.autoPilot) this.toggleAutoPilot(this.v);
   }
 
-  updateAutoPilot(t) {
-    var delta = (t - this.currTime) / 1000;
-    this.v = 2 * Math.PI * delta;
-    this.turnLeft((2 * delta * Math.PI) / 5);
+  toggleAutoPilot(speed) {
+    if (this.autoPilot) {
+      this.autoPilot = false;
+      this.v = speed || 0.0;
+    } else {
+      this.autoPilot = true;
+      this.v = 0.0;
+    }
   }
 
   turnLeft(amount) {
@@ -99,28 +93,41 @@ class MyVehicle extends CGFobject {
     this.rotated = true;
   }
 
-  update(t) {
+  updateAutoPilot(dt) {
+    // make a 5 radius turn in 5 seconds
+    this.v = 2 * Math.PI;
+    this.turnLeft((2 * dt * Math.PI) / 5.0);
+  }
+
+  update(t, isDebug) {
     if (this.currTime == 0) this.currTime = t; // special case for the first update
-    if (this.autoPilot) this.updateAutoPilot(t);
+
+    var dt = (t - this.currTime) / 1000; // delta time
+    if (this.autoPilot) this.updateAutoPilot(dt); // TODO
+
+    var dr = this.v * dt; // delta pos
 
     for (var i = 0; i < this.maxSupplies; ++i) {
       this.supplies[i].update(t);
     }
 
+    /* calculate the 2 components of the velocity */
     this.velocity = [
-      Math.sin(this.ang) * this.v,
+      Math.sin(this.ang) * dr,
       0,
-      Math.cos(this.ang) * this.v,
+      Math.cos(this.ang) * dr,
     ];
 
-    /* COMMENT THIS TO STOP MOVEMENT (GOOD FOR CHECKING ANIMATIONS) */
-    /*
-     * this.pos[0] += this.velocity[0];
-     * this.pos[1] += this.velocity[1];
-     * this.pos[2] += this.velocity[2];
+    /* DEBUG: the block below makes the behicle position static
+     * (GOOD FOR CHECKING ANIMATIONS)
      */
+    if (!isDebug) {
+      this.pos[0] += this.velocity[0];
+      this.pos[1] += this.velocity[1];
+      this.pos[2] += this.velocity[2];
+    }
 
-    this.turbineRot += Math.PI / 16 + this.v;
+    this.gondola.update(this.v); // update gondola turbines pos
 
     if (!this.rotated) {
       if (Math.abs(this.vertStab) < 0.1) this.vertStab = 0;
@@ -130,7 +137,7 @@ class MyVehicle extends CGFobject {
     this.rotated = false;
 
     this.currTime = t;
-    this.flag.update(t, this.v);
+    this.flag.update(dt, this.v);
   }
 
   display(sizeFactor) {
@@ -152,58 +159,8 @@ class MyVehicle extends CGFobject {
     this.sphere.display();
     this.scene.popMatrix();
 
-    /* draw passengerPlace */
-    this.kirovDoorTex.apply();
-    this.scene.pushMatrix();
-    this.scene.translate(0, -1.1, -0.75);
-    this.scene.scale(0.2, 0.2, 1.5);
-    this.scene.rotate(Math.PI / 2, 1, 0, 0);
-    this.cil.display();
-    this.scene.popMatrix();
-
-    this.kirovPlainTex.apply();
-
-    this.scene.pushMatrix();
-    this.scene.translate(0, -1.1, -0.75);
-    this.scene.scale(0.2, 0.2, 0.2);
-    this.sphere.display();
-    this.scene.popMatrix();
-
-    this.scene.pushMatrix();
-    this.scene.translate(0, -1.1, 0.75);
-    this.scene.scale(0.2, 0.2, 0.2);
-    this.sphere.display();
-    this.scene.popMatrix();
-
-    /* passenger turbines */
-    this.scene.pushMatrix();
-    this.scene.translate(0.2, -1.1, -0.8);
-    this.scene.scale(0.1, 0.1, 0.3);
-    this.sphere.display();
-    this.scene.popMatrix();
-
-    this.scene.pushMatrix();
-    this.scene.translate(-0.2, -1.1, -0.8);
-    this.scene.scale(0.1, 0.1, 0.3);
-    this.sphere.display();
-    this.scene.popMatrix();
-
-    /* turbine helices */
-    this.kirovHeliceTex.apply();
-
-    this.scene.pushMatrix();
-    this.scene.translate(0.2, -1.1, -1.1);
-    this.scene.rotate(this.turbineRot, 0, 0, 1);
-    this.scene.scale(0.05, 0.2, 0.01);
-    this.sphere.display();
-    this.scene.popMatrix();
-
-    this.scene.pushMatrix();
-    this.scene.translate(-0.2, -1.1, -1.1);
-    this.scene.rotate(-this.turbineRot, 0, 0, 1);
-    this.scene.scale(0.05, 0.2, 0.01);
-    this.sphere.display();
-    this.scene.popMatrix();
+    /* draw gondola */
+    this.gondola.display();
 
     /* vertical stabilizers */
     this.kirovStabTex.apply();

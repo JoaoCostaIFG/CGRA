@@ -7,8 +7,7 @@ class MyFlag extends CGFobject {
     super(scene);
 
     /* animation */
-    this.max_intensity = max_intensity || 0.1;
-    this.last_t = 0;
+    this.max_intensity = max_intensity || 0.2;
     this.flag_t = 0.0;
     this.flag = new MyPlane(scene, 20);
     this.flagShader = new CGFshader(
@@ -27,25 +26,20 @@ class MyFlag extends CGFobject {
       new CGFtexture(scene, "images/kirov/kirov_plain.png")
     );
 
-    this.flagShader.setUniformsValues({ num_waves: num_waves || 6 });
+    this.flagShader.setUniformsValues({ num_waves: num_waves || 3.0 });
     this.initBuffers();
   }
 
-  update(t, v) {
-    if (this.last_t == 0) this.last_t = t;
-
+  update(dt, v) {
     // this.flag_t += Math.PI / 256.0;
-    var dt = (t - this.last_t) / 1000.0;
-    this.flag_t += dt;
+    this.flag_t += (1 + v * 0.3) * dt;
     this.flagShader.setUniformsValues({ t: this.flag_t });
     this.flagShader.setUniformsValues({ s: v  });
-
-    this.last_t = t;
   }
 
   display() {
     /* side 1 */
-    this.flagShader.setUniformsValues({ intensity: 0.1 });
+    this.flagShader.setUniformsValues({ intensity: this.max_intensity });
     this.scene.setActiveShader(this.flagShader);
     this.kirovPlainTex.apply();
     /* fio 1 */
@@ -72,7 +66,7 @@ class MyFlag extends CGFobject {
     this.scene.popMatrix();
 
     /* side 2 */
-    this.flagShader.setUniformsValues({ intensity: -0.1 });
+    this.flagShader.setUniformsValues({ intensity: -this.max_intensity });
     this.scene.setActiveShader(this.flagShader);
     this.kirovPlainTex.apply();
     /* fio 1 */
