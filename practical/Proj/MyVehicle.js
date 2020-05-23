@@ -99,7 +99,7 @@ class MyVehicle extends CGFobject {
     this.turnLeft((2 * dt * Math.PI) / 5.0);
   }
 
-  update(t, isDebug) {
+  update(t, isFreeze) {
     if (this.currTime == 0) this.currTime = t; // special case for the first update
 
     var dt = (t - this.currTime) / 1000; // delta time
@@ -121,7 +121,7 @@ class MyVehicle extends CGFobject {
     /* DEBUG: the block below makes the behicle position static
      * (GOOD FOR CHECKING ANIMATIONS)
      */
-    if (!isDebug) {
+    if (!isFreeze) {
       this.pos[0] += this.velocity[0];
       this.pos[1] += this.velocity[1];
       this.pos[2] += this.velocity[2];
