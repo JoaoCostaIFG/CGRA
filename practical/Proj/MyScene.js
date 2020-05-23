@@ -93,16 +93,15 @@ class MyScene extends CGFscene {
   }
 
   raceCarKeys() {
-    // TODO
     if (this.vehicle.v > 0) {
-      this.vehicle.v--;
-      if (this.vehicle.v > this.speedFactor) this.vehicle.v = this.speedFactor;
-    } else if (this.vehicle.v < 0) {
-      this.vehicle.v = 0;
+      this.vehicleSpeed -= 0.15;
+      if (this.vehicleSpeed > 5) this.vehicleSpeed = 5;
+    } else if (this.vehicleSpeed < 0) {
+      this.vehicleSpeed = 0;
     }
 
-    if (this.gui.isKeyPressed(0 + "KeyW")) this.vehicle.v++;
-    if (this.gui.isKeyPressed(0 + "KeyS")) this.vehicle.v--;
+    if (this.gui.isKeyPressed(0 + "KeyW")) this.vehicleSpeed += 2;
+    if (this.gui.isKeyPressed(0 + "KeyS")) this.vehicleSpeed -= 1;
   }
 
   zeppelinKeys() {
