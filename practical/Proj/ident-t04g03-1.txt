@@ -1,0 +1,12 @@
+Turma 04, grupo 03
+
+João de Jesus Costa - up201806560
+João Lucas Silva Martins - up201806436
+
+Algumas funcionalidades extra:
+- existe um botão na 'interface' ("Race car controls") que troca o modo de
+controlo da velocidade do veículo para um alternativo que consideramos
+mais "divertido".
+- existe um botão na 'interface' ("Freeze Vehicle") que torna a posição
+do veículo estática. Isto é útil para observar as animações com maior
+detalhe/cuidado.
