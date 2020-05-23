@@ -32,10 +32,6 @@ class MySupply extends CGFobject {
     this.materialBottom = new CGFappearance(this.scene);
     this.textureBottom = new CGFtexture(this.scene, "images/supply_crate/ab_crate_e.png");
     this.materialBottom.setTexture(this.textureBottom);
-
-    this.materialExplosion = new CGFappearance(this.scene);
-    this.textureExplosion = new CGFtexture(this.scene, "images/explosion.png");
-    this.materialExplosion.setTexture(this.textureExplosion);
   }
 
   reset() {

@@ -32,7 +32,7 @@ class MyFlag extends CGFobject {
 
   update(dt, v) {
     // this.flag_t += Math.PI / 256.0;
-    this.flag_t += (1 + v * 0.3) * dt;
+    this.flag_t += (1 + v * 0.2) * dt;
     this.flagShader.setUniformsValues({ t: this.flag_t });
     this.flagShader.setUniformsValues({ s: v  });
   }
